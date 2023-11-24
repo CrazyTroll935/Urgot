@@ -1,17 +1,27 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <Wire.h>
+#include <SoftwareSerial.h>
+SoftwareSerial BT(10,11);
+
 Adafruit_PWMServoDriver servos = Adafruit_PWMServoDriver(0x40); // Dirección de la placa del modulo PCA9685
 unsigned int pos0=172;// ancho de pulso en cuentas para posicion 0°
 unsigned int pos180=565;// ancho de pulso en cuentas para la posicion 180°
+
+char a;
+
 void setup(){
 servos.begin();
 servos.setPWMFreq(60);//Configuracion de la frecuencia del PWM
+Serial.begin(9600);
+BT.begin(38400);
 }
+
 void setServo(uint8_t n_servo, int angulo){
 int duty;
 duty=map(angulo, 0, 180, pos0, pos180);
-servos.setPWM(n_servo, 0, duty);  
-} // con esta funcion podemos enviar a cualquier servomotor al valor del angulo que queramos que se ubique
+servos.setPWM(n_servo, 0, duty);  // con esta funcion podemos enviar a cualquier servomotor al valor del angulo que queramos que se ubique
+} 
+
 void sentarse(){
 setServo(1,90);
 setServo(2,20);
@@ -26,6 +36,7 @@ setServo(10,160);
 setServo(11,90);
 setServo(12,20);  
 }
+
 void pararse(){
 setServo(1,90);
 setServo(2,110);
@@ -40,6 +51,7 @@ setServo(10,70);
 setServo(11,90);
 setServo(12,110);
 }
+
 void adelante(){
 setServo(4,120);
 setServo(8,80);
@@ -70,8 +82,8 @@ setServo(2,110);
 setServo(10,70);
 setServo(6,70);
 delay(100);
-
 }
+
 void atras(){
 setServo(10,120);
 setServo(6,120);
@@ -103,6 +115,7 @@ setServo(4,70);
 setServo(12,110);
 delay(100);
 }
+
 void baile(){
 setServo(2,20);
 setServo(4,160);
@@ -423,6 +436,7 @@ setServo(8,110);
 setServo(10,70);
 setServo(12,110);
 }
+
 void girar(){
 setServo(3,110);
 setServo(1,80);
@@ -464,8 +478,27 @@ delay(200);
 }
 
 void loop(){
-sentarse();
-delay(500);
-baile();
-delay(500);
+if (BT.available()){
+  Serial.write(BT.read());
+} if (BT.available()){
+  a = BT.read();
+  if (a == 'A'){
+    pararse();
+  }
+  if (a == 'B'){
+    sentarse();
+  }
+  if (a == 'C'){
+    girar();
+  }
+ // if (a == 'D'){
+   // baile();
+  //}
+  if (a == 'E'){
+    adelante();
+  }
+  if (a == 'F'){
+    atras();
+  }
+}
 }
